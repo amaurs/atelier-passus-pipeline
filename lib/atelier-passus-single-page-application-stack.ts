@@ -60,6 +60,7 @@ export class AtelierPassusSinglePageApplicationStack extends cdk.Stack {
         new s3_deployment.BucketDeployment(this, 'DeployWebsite', {
             sources: [s3_deployment.Source.asset(path.join(__dirname, '../atelier-passus/build'))],
             destinationBucket: bucket,
+            memoryLimit: 512,
             distribution: cloudfrontDist,
             distributionPaths: ['/index.html'],
         });
