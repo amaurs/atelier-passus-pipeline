@@ -38,6 +38,7 @@ export class AtelierPassusSinglePageApplicationStack extends cdk.Stack {
 
 
         const cloudFrontDistProps: cloudfront.CloudFrontWebDistributionProps = {
+          viewerCertificate: cloudfront.ViewerCertificate.fromCloudFrontDefaultCertificate('www.atelier-passus.com'),
           originConfigs: [
             {
               s3OriginSource: {
