@@ -50,36 +50,68 @@ export class AtelierPassusSinglePageApplicationStack extends cdk.Stack {
 
         bucket.addToResourcePolicy(cloudfrontS3Access);
 
-        const cloudFrontDistProps: cloudfront.CloudFrontWebDistributionProps = {
-            originConfigs: [
-                {
-                    s3OriginSource: {
-                        s3BucketSource: bucket,
-                        originAccessIdentity: cloudFrontOAI,
-                    },
-                    behaviors: [{ isDefaultBehavior: true }],
-                },
-            ],
-            viewerCertificate: {
-                aliases: [primaryDomain],
-                props: {
-                    acmCertificateArn: certificate.certificateArn,
-                    sslSupportMethod: 'sni-only',
-                    minimumProtocolVersion: 'TLSv1.1_2016',
-                }
-            }
-        };
-
         const cloudfrontDist = new cloudfront.CloudFrontWebDistribution(
             this,
             `AtelierPassusConfiguration`,
-            cloudFrontDistProps
-        );
+            {
+                originConfigs: [
+                    {
+                        s3OriginSource: {
+                            s3BucketSource: bucket,
+                            originAccessIdentity: cloudFrontOAI,
+                        },
+                        behaviors: [{ isDefaultBehavior: true }],
+                    },
+                ],
+                viewerCertificate: {
+                    aliases: [primaryDomain],
+                    props: {
+                        acmCertificateArn: certificate.certificateArn,
+                        sslSupportMethod: 'sni-only',
+                        minimumProtocolVersion: 'TLSv1.1_2016',
+                    }
+                }
+            });
 
-        new route53.ARecord(this, 'AtelierPassusAlias', {
+        new route53.ARecord(this, 'AtelierPassusAliasRecord', {
             zone: hostedZone,
             target: route53.RecordTarget.fromAlias(new route53_targets.CloudFrontTarget(cloudfrontDist)),
         });
+
+        new route53.MxRecord(this, 'AtelierPassusMxRecord', {
+            values: [
+                {
+                    hostName: 'ASPMX.L.GOOGLE.COM',
+                    priority: 1,
+                },
+                {
+                    hostName: 'ALT1.ASPMX.L.GOOGLE.COM',
+                    priority: 5,
+                },
+                {
+                    hostName: 'ALT2.ASPMX.L.GOOGLE.COM',
+                    priority: 5,
+                },
+                {
+                    hostName: 'ALT3.ASPMX.L.GOOGLE.COM',
+                    priority: 10,
+                },
+                {
+                    hostName: 'ALT4.ASPMX.L.GOOGLE.COM',
+                    priority: 10,
+                },
+            ],
+            zone: hostedZone,
+            ttl: cdk.Duration.minutes(60),
+        });
+
+        const values = ["v=spf1 include:_spf.google.com ~all"]
+        // values.push(verificationCode);
+
+        new route53.TxtRecord(this, "AtelierPassusTxtRecord", {
+            zone: hostedZone,
+            values: values
+        })
 
         new s3_deployment.BucketDeployment(this, 'AtelierPassusDeployment', {
             sources: [s3_deployment.Source.asset(path.join(__dirname, '../atelier-passus/build'))],
