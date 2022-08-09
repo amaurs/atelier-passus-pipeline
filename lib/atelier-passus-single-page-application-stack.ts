@@ -15,7 +15,7 @@ export class AtelierPassusSinglePageApplicationStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
-        const primaryDomain = 'passus-atelier.com'
+        const primaryDomain = 'atelier-passus.com'
 
         const bucket = new s3.Bucket(this, "AtelierPassusSPABucket", {
             websiteIndexDocument: 'index.html',
@@ -24,7 +24,7 @@ export class AtelierPassusSinglePageApplicationStack extends cdk.Stack {
             bucketName: primaryDomain,
         });
 
-        const cloudFrontOAI = new cloudfront.OriginAccessIdentity(this, 'OAI', {
+        const cloudFrontOAI = new cloudfront.OriginAccessIdentity(this, 'AtelierPassusOriginAccessIdentity', {
             comment: `OAI for Atelier Passus website.`,
         });
 
