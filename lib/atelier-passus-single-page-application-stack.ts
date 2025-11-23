@@ -134,7 +134,7 @@ export class AtelierPassusSinglePageApplicationStack extends cdk.Stack {
         new route53.ARecord(this, "AtelierPassusApiRecord", {
             zone: hostedZone,
             recordName: atelierPassusApiDomain,
-            target: route53.RecordTarget.fromIpAddress("23.22.162.153"),
+            target: route53.RecordTarget.fromIpAddresses("23.22.162.153"),
         })
 
         new s3_deployment.BucketDeployment(this, 'AtelierPassusDeployment', {
