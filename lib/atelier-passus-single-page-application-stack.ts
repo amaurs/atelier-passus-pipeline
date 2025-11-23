@@ -45,6 +45,7 @@ export class AtelierPassusSinglePageApplicationStack extends cdk.Stack {
 
         const certificate = new certificate_manager.Certificate(this, 'AtelierPassusCertificate', {
             domainName: primaryDomain,
+            subjectAlternativeNames: [`api.${primaryDomain}`],
             validation: certificate_manager.CertificateValidation.fromDns(hostedZone),
         });
 
@@ -125,6 +126,15 @@ export class AtelierPassusSinglePageApplicationStack extends cdk.Stack {
         new route53.TxtRecord(this, "AtelierPassusTxtRecord", {
             zone: hostedZone,
             values: values
+        })
+
+        // WordPress API subdomain
+        const atelierPassusApiDomain = `api.${primaryDomain}`
+
+        new route53.ARecord(this, "AtelierPassusApiRecord", {
+            zone: hostedZone,
+            recordName: atelierPassusApiDomain,
+            target: route53.RecordTarget.fromIpAddress("23.22.162.153"),
         })
 
         new s3_deployment.BucketDeployment(this, 'AtelierPassusDeployment', {
