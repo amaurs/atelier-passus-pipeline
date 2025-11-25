@@ -2,7 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { aws_s3 as s3 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { CodePipeline, CodePipelineSource, CodeBuildStep } from 'aws-cdk-lib/pipelines';
+import { CodePipeline, CodePipelineSource, ShellStep } from 'aws-cdk-lib/pipelines';
 import { AtelierPassusAppStage } from './atelier-passus-app-stage';
 
 export class AtelierPassusPipelineStack extends Stack {
@@ -12,7 +12,7 @@ export class AtelierPassusPipelineStack extends Stack {
     const pipeline = new CodePipeline(this, 'AtelierPassusPipeline', {
       pipelineName: 'AtelierPassusPipeline',
 
-      synth: new CodeBuildStep('Build', {
+      synth: new ShellStep('Synth', {
         input: CodePipelineSource.gitHub('amaurs/atelier-passus-pipeline', 'main', {
                     authentication: cdk.SecretValue.secretsManager(process.env.GITHUB_PERSONAL_ACCESS_TOKEN_SECRET_NAME!),
                 }),
