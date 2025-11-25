@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { Stack, StackProps } from 'aws-cdk-lib';
+import { aws_s3 as s3 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { CodePipeline, CodePipelineSource, CodeBuildStep } from 'aws-cdk-lib/pipelines';
 import { AtelierPassusAppStage } from './atelier-passus-app-stage';
@@ -10,6 +11,7 @@ export class AtelierPassusPipelineStack extends Stack {
 
     const pipeline = new CodePipeline(this, 'AtelierPassusPipeline', {
       pipelineName: 'AtelierPassusPipeline',
+
       synth: new CodeBuildStep('Build', {
         input: CodePipelineSource.gitHub('amaurs/atelier-passus-pipeline', 'main', {
                     authentication: cdk.SecretValue.secretsManager(process.env.GITHUB_PERSONAL_ACCESS_TOKEN_SECRET_NAME!),
@@ -24,21 +26,29 @@ export class AtelierPassusPipelineStack extends Stack {
             'REGION': process.env.REGION!,
             'GITHUB_PERSONAL_ACCESS_TOKEN_SECRET_NAME': process.env.GITHUB_PERSONAL_ACCESS_TOKEN_SECRET_NAME!,
         },
+        primaryOutputDirectory: "cdk.out",
         commands: [
-            'node -v',
-            'npm -v',
-            'npx tsc -v',
-            'which node',
-            'which npm',
-            'which npx',
-            'cd atelier-passus',
+            'cd atelier-passus',  // path from project root to React app package.json
             'npm ci',
             'npm run build',
             'cd ..',
             'npm ci',
             'npm run build',
             'npx cdk synth'
-        ]
+        ],
+        buildEnvironment: {
+          buildImage: cdk.aws_codebuild.LinuxBuildImage.STANDARD_7_0
+        },
+        partialBuildSpec: cdk.aws_codebuild.BuildSpec.fromObject({
+          version: '0.2',
+          phases: {
+            install: {
+              'runtime-versions': {
+                nodejs: 18
+              }
+            }
+          }
+        })
       })
     });
 
