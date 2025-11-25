@@ -4,6 +4,7 @@ import { aws_s3 as s3 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { CodePipeline, CodePipelineSource, ShellStep } from 'aws-cdk-lib/pipelines';
 import { AtelierPassusAppStage } from './atelier-passus-app-stage';
+import * as codebuild from 'aws-cdk-lib/aws-codebuild';
 
 export class AtelierPassusPipelineStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -28,6 +29,8 @@ export class AtelierPassusPipelineStack extends Stack {
         },
         primaryOutputDirectory: "cdk.out",
         commands: [
+            'node -v',
+            'npm -v',
             'cd atelier-passus',  // path from project root to React app package.json
             'npm ci',
             'npm run build',
@@ -35,7 +38,17 @@ export class AtelierPassusPipelineStack extends Stack {
             'npm ci',
             'npm run build',
             'npx cdk synth'
-        ]
+        ],
+        partialBuildSpec: codebuild.BuildSpec.fromObject({
+          version: '0.2',
+          phases: {
+            install: {
+              'runtime-versions': {
+                nodejs: '20'
+              }
+            }
+          }
+        }),
       })
     });
 
