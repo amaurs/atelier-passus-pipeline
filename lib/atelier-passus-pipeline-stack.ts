@@ -11,6 +11,11 @@ export class AtelierPassusPipelineStack extends Stack {
 
     const pipeline = new CodePipeline(this, 'AtelierPassusPipeline', {
       pipelineName: 'AtelierPassusPipeline',
+      codeBuildDefaults: {
+        buildEnvironment: {
+          buildImage: cdk.aws_codebuild.LinuxBuildImage.STANDARD_6_0,
+        },
+      },
 
       synth: new ShellStep('Synth', {
         input: CodePipelineSource.gitHub('amaurs/atelier-passus-pipeline', 'main', {
@@ -36,9 +41,7 @@ export class AtelierPassusPipelineStack extends Stack {
             'npm run build',
             'npx cdk synth'
         ],
-        buildEnvironment: {
-          buildImage: cdk.aws_codebuild.LinuxBuildImage.STANDARD_7_0
-        }
+
       })
     });
 
