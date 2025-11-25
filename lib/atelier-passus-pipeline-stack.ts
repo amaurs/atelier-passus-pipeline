@@ -38,17 +38,7 @@ export class AtelierPassusPipelineStack extends Stack {
         ],
         buildEnvironment: {
           buildImage: cdk.aws_codebuild.LinuxBuildImage.STANDARD_7_0
-        },
-        partialBuildSpec: cdk.aws_codebuild.BuildSpec.fromObject({
-          version: '0.2',
-          phases: {
-            install: {
-              'runtime-versions': {
-                nodejs: 18
-              }
-            }
-          }
-        })
+        }
       })
     });
 
