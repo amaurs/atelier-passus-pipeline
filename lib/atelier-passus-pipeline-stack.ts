@@ -33,6 +33,7 @@ export class AtelierPassusPipelineStack extends Stack {
         },
         primaryOutputDirectory: "cdk.out",
         commands: [
+            'n 20',
             'cd atelier-passus',  // path from project root to React app package.json
             'npm ci',
             'npm run build',
