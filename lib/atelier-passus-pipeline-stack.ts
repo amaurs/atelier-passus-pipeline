@@ -13,7 +13,7 @@ export class AtelierPassusPipelineStack extends Stack {
       pipelineName: 'AtelierPassusPipeline',
       codeBuildDefaults: {
         buildEnvironment: {
-          buildImage: cdk.aws_codebuild.LinuxBuildImage.STANDARD_6_0,
+          buildImage: cdk.aws_codebuild.LinuxBuildImage.STANDARD_7_0,
         },
       },
 
