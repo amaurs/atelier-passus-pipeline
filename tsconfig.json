@@ -23,8 +23,15 @@
       "./node_modules/@types"
     ]
   },
+    "include": [
+      "bin/**/*",
+      "lib/**/*",
+      "test/**/*"
+    ],
   "exclude": [
     "node_modules",
-    "cdk.out"
+    "cdk.out",
+    "**/vite.config.ts",
+    "**/atelier-passsus/**"
   ]
 }
