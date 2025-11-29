@@ -134,7 +134,7 @@ export class AtelierPassusSinglePageApplicationStack extends cdk.Stack {
         const apiDistribution = new cloudfront.CloudFrontWebDistribution(this, 'AtelierPassusApiDistribution', {
             originConfigs: [{
                 customOriginSource: {
-                    domainName: '23.22.162.153',
+                    domainName: 'ec2-23-22-162-153.compute-1.amazonaws.com',
                     originProtocolPolicy:cloudfront.OriginProtocolPolicy.HTTP_ONLY,
                 },
                 behaviors: [{ isDefaultBehavior: true }],
