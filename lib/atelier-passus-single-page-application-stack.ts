@@ -131,10 +131,28 @@ export class AtelierPassusSinglePageApplicationStack extends cdk.Stack {
         // WordPress API subdomain
         const atelierPassusApiDomain = `api.${primaryDomain}`
 
+        const apiDistribution = new cloudfront.CloudFrontWebDistribution(this, 'AtelierPassusApiDistribution', {
+            originConfigs: [{
+                customOriginSource: {
+                    domainName: '23.22.162.153',
+                    originProtocolPolicy:cloudfront.OriginProtocolPolicy.HTTP_ONLY,
+                },
+                behaviors: [{ isDefaultBehavior: true }],
+            }],
+            viewerCertificate: {
+                aliases: [atelierPassusApiDomain],
+                props: {
+                    acmCertificateArn: certificate.certificateArn,
+                    sslSupportMethod: 'sni-only',
+                    minimumProtocolVersion: 'TLSv1.2_2021',
+                }
+            },
+        });
+
         new route53.ARecord(this, "AtelierPassusApiRecord", {
             zone: hostedZone,
             recordName: atelierPassusApiDomain,
-            target: route53.RecordTarget.fromIpAddresses("23.22.162.153"),
+            target: route53.RecordTarget.fromAlias(new route53_targets.CloudFrontTarget(apiDistribution)),
         })
 
         new s3_deployment.BucketDeployment(this, 'AtelierPassusDeployment', {
