@@ -22,7 +22,7 @@ export class AtelierPassusPipelineStack extends Stack {
                     authentication: cdk.SecretValue.secretsManager(process.env.GITHUB_PERSONAL_ACCESS_TOKEN_SECRET_NAME!),
                 }),
         additionalInputs: {
-            'atelier-passus': CodePipelineSource.gitHub('amaurs/atelier-passus', 'main', {
+            'atelier-passus': CodePipelineSource.gitHub('amaurs/atelier-passus', 'astro', {
                         authentication: cdk.SecretValue.secretsManager(process.env.GITHUB_PERSONAL_ACCESS_TOKEN_SECRET_NAME!),
                     }),
         },
@@ -34,8 +34,8 @@ export class AtelierPassusPipelineStack extends Stack {
         primaryOutputDirectory: "cdk.out",
         commands: [
             'n 20',
-            'cd atelier-passus',  // path from project root to React app package.json
-            'npm ci',
+            'cd atelier-passus',
+            'npm install',
             'npm run build',
             'cd ..',
             'npm ci',

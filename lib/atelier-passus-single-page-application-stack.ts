@@ -45,7 +45,6 @@ export class AtelierPassusSinglePageApplicationStack extends cdk.Stack {
 
         const certificate = new certificate_manager.Certificate(this, 'AtelierPassusCertificate', {
             domainName: primaryDomain,
-            subjectAlternativeNames: [`api.${primaryDomain}`],
             validation: certificate_manager.CertificateValidation.fromDns(hostedZone),
         });
 
@@ -76,14 +75,14 @@ export class AtelierPassusSinglePageApplicationStack extends cdk.Stack {
                     {
                         errorCode: 403,
                         errorCachingMinTtl: 10,
-                        responseCode: 403,
-                        responsePagePath: '/index.html',
+                        responseCode: 404,
+                        responsePagePath: '/404.html',
                     },
                     {
                         errorCode: 404,
                         errorCachingMinTtl: 10,
                         responseCode: 404,
-                        responsePagePath: '/index.html',
+                        responsePagePath: '/404.html',
                     },
                 ]
             });
@@ -126,33 +125,6 @@ export class AtelierPassusSinglePageApplicationStack extends cdk.Stack {
         new route53.TxtRecord(this, "AtelierPassusTxtRecord", {
             zone: hostedZone,
             values: values
-        })
-
-        // WordPress API subdomain
-        const atelierPassusApiDomain = `api.${primaryDomain}`
-
-        const apiDistribution = new cloudfront.CloudFrontWebDistribution(this, 'AtelierPassusApiDistribution', {
-            originConfigs: [{
-                customOriginSource: {
-                    domainName: 'ec2-23-22-162-153.compute-1.amazonaws.com',
-                    originProtocolPolicy:cloudfront.OriginProtocolPolicy.HTTP_ONLY,
-                },
-                behaviors: [{ isDefaultBehavior: true }],
-            }],
-            viewerCertificate: {
-                aliases: [atelierPassusApiDomain],
-                props: {
-                    acmCertificateArn: certificate.certificateArn,
-                    sslSupportMethod: 'sni-only',
-                    minimumProtocolVersion: 'TLSv1.2_2021',
-                }
-            },
-        });
-
-        new route53.ARecord(this, "AtelierPassusApiRecord", {
-            zone: hostedZone,
-            recordName: atelierPassusApiDomain,
-            target: route53.RecordTarget.fromAlias(new route53_targets.CloudFrontTarget(apiDistribution)),
         })
 
         new s3_deployment.BucketDeployment(this, 'AtelierPassusDeployment', {
